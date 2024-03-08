@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   app: 
-    image: apc91/app_vuelos:v1
+    image: apc91/ms-flights-api-gateway:1.0.0
     container_name: app_vuelos
     env_file: .env
     ports: 
@@ -15,7 +15,7 @@ services:
       - ms_nestjs
 
   microservice-flights: 
-    image: apc91/microservice-flights:v1
+    image: apc91/microservice-flights:1.0.0
     container_name: microservice-flights
     env_file: .env
     depends_on:
@@ -26,7 +26,7 @@ services:
         - ms_nestjs
 
   microservice-passengers: 
-    image: apc91/microservice-passengers:v1
+    image: apc91/microservice-passengers:1.0.0
     container_name: microservice-passengers
     env_file: .env
     depends_on:
@@ -37,7 +37,7 @@ services:
       - ms_nestjs
 
   microservice-users: 
-    image: apc91/microservice-users:v1
+    image: apc91/microservice-users:1.0.0
     container_name: microservice-users
     env_file: .env
     depends_on:
@@ -45,16 +45,6 @@ services:
       - rabbitmq
     restart: always
     networks: 
-      - ms_nestjs
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rmq
-    expose:
-      - 5672
-      - 15672
-    restart: always
-    networks:
       - ms_nestjs
 
   mongodb:
@@ -66,8 +56,21 @@ services:
       - MONGO_LOG_DIR=/dev/null
     volumes:
       - mongodb:/data/db
-    expose:
-      - 27017
+    ports:
+      - 27017:27017
+    networks:
+      - ms_nestjs
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5673:5672
+      - 15673:15672
+    restart: always
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
       - ms_nestjs
 
